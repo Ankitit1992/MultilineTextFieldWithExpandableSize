@@ -1,0 +1,108 @@
+//
+//  TextViewExpand.swift
+//  TextViewExpand
+//
+//  Created by Ankit Tiwari on 20/07/22.
+//
+
+import UIKit
+
+class TextFieldView: UIView {
+    var txtView = UITextView()
+    var errorMessageLbl = UILabel()
+    var instructionLbl = UILabel()
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.backgroundColor = .clear
+        txtView.frame = self.frame
+        errorMessageLbl.frame = CGRect(x: 0, y: txtView.frame.height + 2, width: self.frame.width, height: 15)
+        instructionLbl.frame = CGRect(x: 0, y: 0 , width: self.frame.width, height: 15)
+        self.addSubview(txtView)
+        self.addSubview(instructionLbl)
+        self.addSubview(errorMessageLbl)
+        
+        txtView.translatesAutoresizingMaskIntoConstraints = false
+        [txtView.topAnchor.constraint(equalTo: instructionLbl.bottomAnchor, constant: 4),
+         txtView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+         txtView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+         txtView.heightAnchor.constraint(equalToConstant: self.frame.height - 19)
+        ].forEach{$0.isActive = true}
+        errorMessageLbl.text = "This Is error"
+        instructionLbl.text = "This Is me"
+        txtView.isScrollEnabled = false
+        txtView.delegate = self
+    }
+    
+    func txtViewLayoutChange(_ txtView: UITextView) {
+        let esmitated = CGSize(width: txtView.frame.width, height: .infinity)
+        let esmitatedSize = txtView.sizeThatFits(esmitated)
+        estimatedHeight(esmitatedSize)
+    }
+    
+    @IBInspectable var txtViewborder: CGFloat = 0.0 {
+        didSet {
+            txtView.layer.borderWidth = txtViewborder
+        }
+    }
+    
+    @IBInspectable var txtViewborderColor: UIColor = UIColor.clear {
+        didSet {
+            txtView.layer.borderColor = txtViewborderColor.cgColor
+        }
+    }
+    
+    @IBInspectable var textViewCornerRadius: CGFloat = 0.0 {
+        didSet {
+            txtView.layer.cornerRadius = textViewCornerRadius
+        }
+    }
+    
+    @IBInspectable var errorColor: UIColor = .clear {
+        didSet {
+            errorMessageLbl.textColor = errorColor
+        }
+    }
+    
+    
+    func defaultDesignForView() {
+        self.backgroundColor = .white
+        self.layer.borderColor = UIColor.green.cgColor
+        self.layer.borderWidth = 1.0
+        self.layer.cornerRadius = 5.0
+        txtView.layer.borderColor = UIColor.clear.cgColor
+    }
+    
+    func defaultDesignForTxtView() {
+        self.backgroundColor = .clear
+        self.layer.borderColor = UIColor.clear.cgColor
+        self.layer.borderWidth = 0.0
+        self.layer.cornerRadius = 0.0
+        txtView.layer.borderColor = UIColor.green.cgColor
+    }
+    
+}
+
+extension TextFieldView: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        
+        let esmitated = CGSize(width: txtView.frame.width, height: 45)
+        let esmitatedSize = txtView.sizeThatFits(esmitated)
+        estimatedHeight(esmitatedSize)
+    }
+    
+    private func estimatedHeight( _ esmitatedSize: CGSize) {
+        txtView.constraints.forEach {
+            if $0.firstAttribute == .height {
+                if esmitatedSize.height <= 30 {
+                    $0.constant = esmitatedSize.height + 15
+                    errorMessageLbl.frame = CGRect(x: 0, y: esmitatedSize.height + 34 , width: self.frame.width, height: 15)
+                } else {
+                    $0.constant = esmitatedSize.height
+                    errorMessageLbl.frame = CGRect(x: 0, y: esmitatedSize.height + 19 , width: self.frame.width, height: 15)
+                }
+            }
+        }
+    }
+}
+
